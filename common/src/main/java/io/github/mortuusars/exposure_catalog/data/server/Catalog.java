@@ -1,0 +1,107 @@
+package io.github.mortuusars.exposure_catalog.data.server;
+
+import com.mojang.logging.LogUtils;
+import io.github.mortuusars.exposure.ExposureServer;
+import io.github.mortuusars.exposure.world.level.storage.ExposureData;
+import io.github.mortuusars.exposure_catalog.data.ExposureInfo;
+import io.github.mortuusars.exposure_catalog.network.Packets;
+import io.github.mortuusars.exposure_catalog.network.packet.Packet;
+import io.github.mortuusars.exposure_catalog.network.packet.clientbound.SendExposureInfosS2CP;
+import net.minecraft.util.Util;
+import net.minecraft.server.level.ServerPlayer;
+import org.slf4j.Logger;
+import java.time.Duration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+
+public class Catalog {
+    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final int CLEAR_TIME_ACTIVE_MINUTES = 30;
+    private static final int CLEAR_TIME_INACTIVE_MINUTES = 0;
+    private static final CatalogCache CACHE = new CatalogCache();
+
+    // Cache clearing system. Clearing is done on world save if the timestamp allows it.
+    private static final Set<ServerPlayer> watchingPlayers = new HashSet<>();
+    private static long clearTimestamp = Long.MAX_VALUE;
+
+    public static CatalogCache getCache() {
+        return CACHE;
+    }
+
+    public static void queryExposures(ServerPlayer player, boolean forceRebuild) {
+        Runnable onFinished = () -> sendToPlayer(player);
+
+        if (forceRebuild)
+            CACHE.rebuild(onFinished);
+        else
+            CACHE.buildIfNeeded(onFinished);
+
+        addWatchingPlayer(player);
+    }
+
+    public static void sendToPlayer(ServerPlayer player) {
+        send(packet -> Packets.sendToClient(packet, player));
+    }
+
+    public static void send(Consumer<Packet> sender) {
+        List<ExposureInfo> exposures = CACHE.getExposures().values().stream().toList();
+        sender.accept(new SendExposureInfosS2CP(exposures));
+    }
+
+    public static void onExposureSaved(String id, ExposureData data) {
+        CACHE.addExposure(id, data);
+    }
+
+    public static boolean deleteExposure(String exposureId) {
+        try {
+            if (ExposureServer.exposureRepository().delete(exposureId)) {
+                LOGGER.info("{} deleted.", exposureId);
+                CACHE.removeExposure(exposureId);
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("Deleting exposure failed: ", e);
+            return false;
+        }
+    }
+
+    /**
+     * Adds a player to the "watching" list. This tells the Catalog that the player needs it and clearing would be deferred.
+     */
+    public static void addWatchingPlayer(ServerPlayer player) {
+        watchingPlayers.add(player);
+        updateClearTime();
+    }
+
+    /**
+     * Removes a player from "watching" list.
+     */
+    public static void removeWatchingPlayer(ServerPlayer player) {
+        watchingPlayers.remove(player);
+        updateClearTime();
+    }
+
+    public static boolean shouldClear() {
+        return clearTimestamp <= Util.getMillis();
+    }
+
+    public static void clear() {
+        getCache().clear();
+        clearTimestamp = Long.MAX_VALUE;
+
+        send(Packets::sendToAllClients);
+    }
+
+    public static void onServerStopping() {
+        CACHE.clear();
+        watchingPlayers.clear();
+        clearTimestamp = Long.MAX_VALUE;
+    }
+
+    private static void updateClearTime() {
+        clearTimestamp = Util.getMillis() + (Duration.ofMinutes(watchingPlayers.isEmpty()
+                ? CLEAR_TIME_INACTIVE_MINUTES : CLEAR_TIME_ACTIVE_MINUTES).toMillis());
+    }
+}

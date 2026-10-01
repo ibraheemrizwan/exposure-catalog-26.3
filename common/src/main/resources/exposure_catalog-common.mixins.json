@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "io.github.mortuusars.exposure_catalog.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "ServerLevelMixin",
+    "ExposureRepositoryMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
