@@ -1,17 +1,28 @@
-<p align="center"><img src="docs/icon.png" width="112" alt="Exposure Catalog"></p>
-<h1 align="center">Exposure Catalog</h1>
-<p align="center">Browse, export and manage the photographs stored in your world.</p>
-<p align="center"><strong>Minecraft 26.3 · Fabric · Unofficial port</strong></p>
-<p align="center"><a href="https://github.com/ibraheemrizwan/exposure-catalog-26.3/releases/latest">Download JAR</a> · <a href="https://github.com/ibraheemrizwan/exposure-catalog-26.3">Source</a> · <a href="https://github.com/ibraheemrizwan/exposure-catalog-26.3/issues">Report an issue</a> · <a href="https://modrinth.com/mod/exposure-catalog">Original on Modrinth</a></p>
+<br>
 
-## Your world's photo collection
+<p align="center"><img src="https://raw.githubusercontent.com/mortuusars/resources/main/media/exposure_catalog/main.png" alt="Exposure Catalog" width="225"></p>
 
-Run `/exposure catalog` to browse the exposures stored in your current world.
-Preview photographs, export images, or remove exposures you no longer need.
-The textures view also lets you browse loaded game and resource-pack textures.
+<h3 align="center">Browse the photographs in your world</h3>
 
-The command requires permission level 3 by default. Enabling cheats in a
-singleplayer world provides access. Install the mod on both client and server.
+<p align="center"><strong>Minecraft 26.3 · Fabric · Unofficial port</strong><br>Original mod and artwork by mortuusars.</p>
+
+<p align="center"><a href="https://github.com/ibraheemrizwan/exposure-catalog-26.3/releases/latest"><strong>Download JAR</strong></a> · <a href="https://github.com/ibraheemrizwan/exposure-catalog-26.3">GitHub</a> · <a href="https://github.com/ibraheemrizwan/exposure-catalog-26.3/issues">Report an issue</a> · <a href="https://modrinth.com/mod/exposure-catalog">Original Modrinth page</a></p>
+
+<br>
+
+<p align="center">An addon for <a href="https://github.com/ibraheemrizwan/exposure-26.3">Exposure</a>.</p>
+
+Use `/exposure catalog` to browse, preview, export or delete the exposures saved
+in your current world. Switch to the textures view to inspect loaded game, mod
+and resource-pack textures.
+
+<p align="center"><img src="https://raw.githubusercontent.com/mortuusars/resources/main/media/exposure_catalog/screen.png" alt="Exposure Catalog interface" width="1000"></p>
+
+The command requires permission level 3 by default; singleplayer cheats provide
+access. Install Catalog on both the client and server.
+
+<details>
+<summary>26.3 installation, compatibility and source</summary>
 
 ## Installation
 
@@ -54,3 +65,6 @@ build, pass `-PexposureJar=/path/to/exposure.jar`.
 ## License
 
 [MIT](LICENSE.md). Original attribution is preserved in [NOTICE.md](NOTICE.md).
+
+</details>
+
